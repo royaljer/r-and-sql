@@ -1,0 +1,16 @@
+load(dplyr) #dplyr is an incredibly useful library for cleaning data in R; it has functions which mirror many common SQL commands.
+
+nyt<-read.csv("F:/My Documents/Rdocs/NYTimes.csv") #dataset is from the NYTimes. footstamp demographcis in each state of the US.
+
+names(nyt)[6:9] <- c("pct","pctchildren","pctblack","pctwhite") #transforming some of the headers for ease of use.
+
+avgpct <- summarise(group_by(nyt, State), AvgChiPct = mean(pctchildren)) #creating a dataframe with each states' mean % of children receiving foodstamps. dplyr's group_by function is similar to the command in SQL.
+
+avgpct2 <- mutate(avgpct, radius = sqrt(AvgChiPct/pi)) #using the mutate() function in dplyr to provide an additional column 
+#'radius'; this will come in handy for the bubble plot.
+
+avgpct.bg <- with(avgpct2, symbols(1:nrow(avgpct2), avgpct2$AvgChiPct,
+circles = avgpct2$radius, inches=0.25, fg="black", bg="#99CCFF", xlab="State", ylab="% Children Food Stamps")) 
+with(avgpct2, text(1:nrow(avgpct2), avgpct2$AvgChiPct, avgpct2$State, cex=0.60)) 
+#Using symbols() to make the bubblegraph - I prefer it to plot() for this particular form of visualization
+#Followed by state abbreviations for each bubble
