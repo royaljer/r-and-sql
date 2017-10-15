@@ -1,3 +1,5 @@
+#R code for a simple bubble plot
+
 load(dplyr) #dplyr is an incredibly useful library for cleaning data in R; it has functions which mirror many common SQL commands.
 
 nyt<-read.csv("F:/My Documents/Rdocs/NYTimes.csv") #dataset is from the NYTimes. footstamp demographcis in each state of the US.
