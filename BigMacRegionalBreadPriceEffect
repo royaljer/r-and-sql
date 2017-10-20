@@ -1,0 +1,53 @@
+##A linear model of several variables from UBS' collection of wage and commodity price data from around the world.
+##In this case, I had created a model to evaluate the effect of several variables on the price of a Big Mac (measured
+##in log minutes of labor requiredto purchase a single Big Mac) from 4 regions of the world. Afterwards, I was 
+##tasked with creating an effect plot to specifically highlight the effect of bread price (measured in log minutes 
+##of labor required to purchase 1kg of bread) on Big Mac Price, by region (N. America and W. Europe [NAw], E. Europe and
+##the Middle East [DEm], Asia [DAs], S. America and parts of Africa [DSa]).
+
+##The linear model I use (bigmacbread.lm) is based on a series of nested F-testing. The reader will need to
+##take it on faith that this is the most parsimonious model which still preserves hierarchy.
+
+attach(ubs) ##This is an admittedly older data data set, from 2010 or 2011.
+
+##First, I create the neccesary interaction terms. Again, these specific chocies derive from several stages
+##of nested F-testing.
+DAsBread <- DAs * Bread 
+DAsrice <- DAs * Rice
+DAsvac <- DAs * Vac
+DEmvac <- DEm * Vac
+DSaBread <- DSa * Bread
+
+bigmacbread.lm <- lm(Bigmac ~ DAs + DEm + DSa + Bread + Wage + Rice + Vac + DAsrice + DAsvac + DEmvac + DAsBread
+                     + DSaBread)
+
+##In order to tease out the effect of bread prices specifically, I have to create a function which relies on
+##mean wages, number of vacation days, and hours of labor required to buy 1kg of rice (as before, all converted to natural logs)
+mwage <- mean(Wage)
+mvac <- mean(Vac)
+mrice <- mean(Rice)
+
+##Extracting the coefficients from my linear model
+bigmacbetas <- coef(summary(bigmacbread.lm))[1:13]
+
+##Setting up the bread effect function using the bigmacbread.lm coeffecients + the means calculated above
+breadeffect <- bigmacbetas[1] + bigmacbetas[2] + bigmacbetas[3] + 
+  bigmacbetas[4] + (bigmacbetas[5] * Bread) + (bigmacbetas[6] * mwage) +
+  (bigmacbetas[7] * mrice) + (bigmacbetas[8] * mvac) + (bigmacbetas[9] * DAs * mrice) +
+  (bigmacbetas[10] * DAs * mvac) + (bigmacbetas[11] * DEm * mvac) + 
+  (bigmacbetas[12] * DAs * Bread) + (bigmacbetas[13] * DSa * Bread)
+
+##Creating a new data frame with Bread prices, the output from the breadeffect function, and the region dummy variables.
+##N. America/Western Europe were the reference region in this data set. In order to create data with would play nice
+##with ggplot, I had to combine the seperate dummy variables into 1 categorical column ("Region"), then replace the NAs
+##with the abbreviation for N. America/W. Europe
+dfbef <- data.frame(Bread, breadeffect, DAs, DEm, DSa)
+dfbef$Region <- names(dfbef[3:5])[apply(dfbef[3:5], 1, match, x = 1)]
+dfbef$Region[is.na(dfbef$Region)] <- "NAw"
+
+##After this, it was a fairly simple task of creating the effects plot in ggplot, including a legend on the right-hand side.
+##You can view the graph itself in the R and SQL folder.
+ggplot(data = dfbef, aes(x = Bread, y = breadeffect, group = Region, colour = Region)) + ylab("Log. Minutes To Buy One BigMac") + 
+  xlab("Log. Minutes To Buy 1kg Bread ") + geom_line(size = 1) +
+  ggtitle("Effect of Bread Price on BicMac Price, by Region") +
+  scale_color_discrete(name = "Region", breaks = c("NAw","DEm","DAs","DSa"), labels = c("North America\nWestern Europe","Eastern Europe\nMiddle East","Asia","South America\nAfrica"))
