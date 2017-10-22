@@ -1,5 +1,6 @@
 ##Using a dataset from IMDB, I used a left join to find all actors (+ director) who were involved
-##in the first two "Godfather" movies. 
+##in the first two "Godfather" movies. In PostgreSQL you could use the INTERSECT function, but as this
+##is not available in all RDMS' I prefer to use JOIN.
 
 SELECT *
 FROM (SELECT movies.title, people.name, role_type.role, cast_info.person_id AS gf2id
