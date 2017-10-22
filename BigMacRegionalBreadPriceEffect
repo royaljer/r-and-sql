@@ -1,8 +1,8 @@
 ##A linear model of several variables from UBS' collection of wage and commodity price data from around the world.
 ##In this case, I had created a model to evaluate the effect of several variables on the price of a Big Mac (measured
-##in log minutes of labor requiredto purchase a single Big Mac) from 4 regions of the world. Afterwards, I was 
-##tasked with creating an effect plot to specifically highlight the effect of bread price (measured in log minutes 
-##of labor required to purchase 1kg of bread) on Big Mac Price, by region (N. America and W. Europe [NAw], E. Europe and
+##in log minutes of labor required to purchase a single Big Mac) from 4 regions of the world. Afterwards, I was 
+##tasked with creating an effects plot to specifically highlight the effect of bread price (measured in log minutes 
+##of labor required to purchase 1kg of bread) on Big Mac price by region (N. America and W. Europe [NAw], E. Europe and
 ##the Middle East [DEm], Asia [DAs], S. America and parts of Africa [DSa]).
 
 ##The linear model I use (bigmacbread.lm) is based on a series of nested F-testing. The reader will need to
@@ -37,10 +37,10 @@ breadeffect <- bigmacbetas[1] + bigmacbetas[2] + bigmacbetas[3] +
   (bigmacbetas[10] * DAs * mvac) + (bigmacbetas[11] * DEm * mvac) + 
   (bigmacbetas[12] * DAs * Bread) + (bigmacbetas[13] * DSa * Bread)
 
-##Creating a new data frame with Bread prices, the output from the breadeffect function, and the region dummy variables.
-##N. America/Western Europe were the reference region in this data set. In order to create data with would play nice
+##Creating a new data frame with bread prices, the output from the breadeffect function, and the region dummy variables.
+##N. America/Western Europe were the reference region in this data set. In order to create data which would play nice
 ##with ggplot, I had to combine the seperate dummy variables into 1 categorical column ("Region"), then replace the NAs
-##with the abbreviation for N. America/W. Europe
+##with the abbreviation for N. America/W. Europe (NAw)
 dfbef <- data.frame(Bread, breadeffect, DAs, DEm, DSa)
 dfbef$Region <- names(dfbef[3:5])[apply(dfbef[3:5], 1, match, x = 1)]
 dfbef$Region[is.na(dfbef$Region)] <- "NAw"
