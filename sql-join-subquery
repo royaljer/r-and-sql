@@ -6,7 +6,7 @@ SELECT p.name, r.role, ci.person_id AS cipid
 FROM cast_info ci JOIN people p ON p.id = ci.person_id
 JOIN role_type r ON r.id = ci.role_id 
 WHERE ci.movie_id = 2458108 AND ci.person_id IN
-(SELECT ci.person_id
-FROM cast_info ci JOIN people p ON p.id = ci.person_id
-JOIN role_type r ON r.id = ci.role_id 
-WHERE ci.movie_id = 2458086)
+  (SELECT ci.person_id
+  FROM cast_info ci JOIN people p ON p.id = ci.person_id
+  JOIN role_type r ON r.id = ci.role_id 
+  WHERE ci.movie_id = 2458086)
