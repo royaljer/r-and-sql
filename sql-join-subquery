@@ -1,0 +1,12 @@
+##Using a dataset from IMDB, I used a left join to find all actors (+ director) who were involved
+##in the first two "Godfather" movies. In PostgreSQL you could use the INTERSECT function, but as this
+##is not available in all RDBMS' I prefer to use JOIN and a subquery.
+
+SELECT p.name, r.role, ci.person_id AS cipid
+FROM cast_info ci JOIN people p ON p.id = ci.person_id
+JOIN role_type r ON r.id = ci.role_id 
+WHERE ci.movie_id = 2458108 AND ci.person_id IN
+(SELECT ci.person_id
+FROM cast_info ci JOIN people p ON p.id = ci.person_id
+JOIN role_type r ON r.id = ci.role_id 
+WHERE ci.movie_id = 2458086)
